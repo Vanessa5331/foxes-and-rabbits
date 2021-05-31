@@ -3,28 +3,31 @@ package io.muic.ooc.fab;
 import java.util.List;
 import java.util.Random;
 
-public class Fox extends Animal {
-    // Characteristics shared by all foxes (class variables).
+public class Tiger extends Animal{
+    // Characteristics shared by all tigers (class variables).
 
-    // The age at which a fox can start to breed.
-    private static final int BREEDING_AGE = 15;
-    // The age to which a fox can live.
+    // The age at which a tiger can start to breed.
+    private static final int BREEDING_AGE = 30;
+    // The age to which a tiger can live.
     private static final int MAX_AGE = 150;
-    // The likelihood of a fox breeding.
-    private static final double BREEDING_PROBABILITY = 0.08;
+    // The likelihood of a tiger breeding.
+    private static final double BREEDING_PROBABILITY = 0.045;
     // The maximum number of births.
-    private static final int MAX_LITTER_SIZE = 2;
+    private static final int MAX_LITTER_SIZE = 1;
     // The food value of a single rabbit. In effect, this is the
-    // number of steps a fox can go before it has to eat again.
-    private static final int RABBIT_FOOD_VALUE = 9;
+    // number of steps a tiger can go before it has to eat again.
+    private static final int RABBIT_FOOD_VALUE = 6;
+    // The food value of a single fox. In effect, this is the
+    // number of steps a tiger can go before it has to eat again.
+    private static final int FOX_FOOD_VALUE = 10;
     // Random generator
     private static final Random RANDOM = new Random();
 
-    // The fox's food level, which is increased by eating rabbits.
+    // The tiger's food level, which is increased by eating rabbits.
     private int foodLevel;
 
     /**
-     * Create a fox. A fox can be created as a new born (age zero and not
+     * Create a tiger. A tiger can be created as a new born (age zero and not
      * hungry) or with a random age and food level.
      *
      * @param field The field currently occupied.
@@ -47,19 +50,19 @@ public class Fox extends Animal {
     }
 
     /**
-     * This is what the fox does most of the time: it hunts for rabbits. In the
+     * This is what the tiger does most of the time: it hunts for rabbits. In the
      * process, it might breed, die of hunger, or die of old age.
      *
-     * @param newFoxes A list to return newly born foxes.
+     * @param newTigers A list to return newly born tigers.
      */
     @Override
-    public void act(List<Animal> newFoxes) {
+    public void act(List<Animal> newTigers) {
         incrementHunger();
-        super.act(newFoxes);
+        super.act(newTigers);
     }
 
     /**
-     * Make this fox more hungry. This could result in the fox's death.
+     * Make this tiger more hungry. This could result in the tiger's death.
      */
     private void incrementHunger() {
         foodLevel--;
@@ -83,6 +86,13 @@ public class Fox extends Animal {
                 if (rabbit.isAlive()) {
                     rabbit.setDead();
                     foodLevel = RABBIT_FOOD_VALUE;
+                    return where;
+                }
+            } else if (animal instanceof Fox) {
+                Fox fox = (Fox) animal;
+                if (fox.isAlive()) {
+                    fox.setDead();
+                    foodLevel = FOX_FOOD_VALUE;
                     return where;
                 }
             }
@@ -112,8 +122,8 @@ public class Fox extends Animal {
 
     @Override
     protected Animal createYoung(Field field, Location location) {
-        Fox fox = new Fox();
-        fox.create(field, location);
-        return fox;
+        Tiger tiger = new Tiger();
+        tiger.create(field, location);
+        return tiger;
     }
 }
