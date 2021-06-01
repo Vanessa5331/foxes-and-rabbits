@@ -32,10 +32,11 @@ public class FieldStats {
         }
         for (Class key : counters.keySet()) {
             Counter info = counters.get(key);
-            buffer.append(info.getName());
+            String name = info.getName().split("io.muic.ooc.fab.")[1];
+            buffer.append(name);
             buffer.append(": ");
             buffer.append(info.getCount());
-            buffer.append(' ');
+            buffer.append("\t\t\t");
         }
         return buffer.toString();
     }
