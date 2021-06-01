@@ -1,27 +1,26 @@
 package io.muic.ooc.fab;
 
 
+import io.muic.ooc.fab.observer.Observable;
+import io.muic.ooc.fab.observer.Observer;
+import io.muic.ooc.fab.observer.SimulatorViewObserver;
 import io.muic.ooc.fab.view.SimulatorView;
 
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
 import java.util.Random;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.awt.Color;
 
-public class Simulator {
+public class Simulator extends Observable {
 
     // Constants representing configuration information for the simulation.
     // The default width for the grid.
     private static final int DEFAULT_WIDTH = 120;
     // The default depth of the grid.
     private static final int DEFAULT_DEPTH = 80;
-    // Lists of animals in the field.
-    private List<Animal> animals;
-    // The hunter of the field.
-    private final Actor hunter;
+    // Lists of actors in the field.
+    private List<Actor> actors;
     // The current state of the field.
     private Field field;
     // The current step of the simulation.
@@ -52,7 +51,7 @@ public class Simulator {
             width = DEFAULT_WIDTH;
         }
 
-        animals = new ArrayList<>();
+        actors = new ArrayList<>();
         field = new Field(depth, width);
 
         // Create a view of the state of each location in the field.
@@ -62,9 +61,8 @@ public class Simulator {
         view.setColor(Tiger.class, Color.ORANGE);
         view.setColor(Hunter.class, Color.BLUE);
 
-        // Create a hunter at random place in the field
-        Location location = new Location(depth/2, width/2);
-        hunter = ActorFactory.createHunter(field, location);
+        Observer observer = new SimulatorViewObserver(view);
+        addObserver(observer);
 
         // Setup a valid starting point.
         reset();
@@ -87,7 +85,7 @@ public class Simulator {
     public void simulate(int numSteps) {
         for (int step = 1; step <= numSteps && view.isViable(field); step++) {
             simulateOneStep();
-            // delay(60);   // uncomment this to run more slowly
+            delay(30);   // uncomment this to run more slowly
         }
     }
 
@@ -99,22 +97,21 @@ public class Simulator {
         step++;
 
         // Provide space for newborn animals.
-        List<Animal> newAnimals = new ArrayList<>();
+        List<Actor> newActors = new ArrayList<>();
         // Let all animals act.
-        for (Iterator<Animal> it = animals.iterator(); it.hasNext();) {
-            Animal animal = it.next();
-            animal.act(newAnimals);
-            if (!animal.isAlive()) {
+        for (Iterator<Actor> it = actors.iterator(); it.hasNext();) {
+            Actor actor = it.next();
+            actor.act(newActors);
+
+            if (!actor.isAlive()) {
                 it.remove();
             }
         }
 
-        hunter.act(null);
+        // Add the newly born actors to the main lists.
+        actors.addAll(newActors);
 
-        // Add the newly born foxes and rabbits to the main lists.
-        animals.addAll(newAnimals);
-
-        view.showStatus(step, field);
+        notifyAll(step, field);
     }
 
     /**
@@ -122,11 +119,11 @@ public class Simulator {
      */
     public void reset() {
         step = 0;
-        animals.clear();
+        actors.clear();
         populate();
 
         // Show the starting state in the view.
-        view.showStatus(step, field);
+        notifyAll(step, field);
     }
 
     /**
@@ -137,18 +134,13 @@ public class Simulator {
         field.clear();
         for (int row = 0; row < field.getDepth(); row++) {
             for (int col = 0; col < field.getWidth(); col++) {
-                if (RANDOM.nextDouble() <= AnimalType.TIGER.getCreationProbability()) {
-                    Location location = new Location(row, col);
-                    Animal tiger = ActorFactory.createAnimal(AnimalType.TIGER, field, location);
-                    animals.add(tiger);
-                }else if (RANDOM.nextDouble() <= AnimalType.FOX.getCreationProbability()) {
-                    Location location = new Location(row, col);
-                    Animal fox = ActorFactory.createAnimal(AnimalType.FOX, field, location);
-                    animals.add(fox);
-                } else if (RANDOM.nextDouble() <= AnimalType.RABBIT.getCreationProbability()) {
-                    Location location = new Location(row, col);
-                    Animal rabbit = ActorFactory.createAnimal(AnimalType.RABBIT, field, location);
-                    animals.add(rabbit);
+                double rand = RANDOM.nextDouble();
+                for (ActorType actorType: ActorType.values()){
+                    if (rand <= actorType.getCreationProbability()){
+                        Location location = new Location(row, col);
+                        Actor actor = ActorFactory.createActor(actorType, true, field, location);
+                        actors.add(actor);
+                    }
                 }
                 // else leave the location empty.
             }

@@ -1,28 +1,16 @@
 package io.muic.ooc.fab;
 
+import java.lang.reflect.InvocationTargetException;
+
 public class ActorFactory {
 
-    public static Actor createHunter(Field field, Location location){
-        Hunter hunter = new Hunter();
-        hunter.create(field, location);
-        return hunter;
-    }
-
-    public static Animal createAnimal(AnimalType animalType, Field field, Location location){
-        if(animalType.equals(AnimalType.RABBIT)){
-            Rabbit rabbit = new Rabbit();
-            rabbit.create(field, location);
-            return rabbit;
-        }else if(animalType.equals(AnimalType.FOX)){
-            Fox fox = new Fox();
-            fox.create(field, location);
-            return fox;
-        }else if(animalType.equals(AnimalType.TIGER)){
-            Tiger tiger = new Tiger();
-            tiger.create(field, location);
-            return tiger;
-        }else{
-            throw new IllegalArgumentException("Unknown animal type");
+    public static Actor createActor(ActorType actorType, boolean randomAge, Field field, Location location){
+        try {
+            return actorType.getActorClass().getConstructor(boolean.class, Field.class, Location.class).newInstance(randomAge, field, location);
+        } catch (InstantiationException | InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
+            e.printStackTrace();
         }
+        System.out.println("Unknown actor type");
+        return null;
     }
 }

@@ -7,36 +7,22 @@ public class Tiger extends Animal{
     // Characteristics shared by all tigers (class variables).
 
     // The age at which a tiger can start to breed.
-    private static final int BREEDING_AGE = 30;
+    private static final int BREEDING_AGE = 35;
     // The age to which a tiger can live.
-    private static final int MAX_AGE = 150;
+    private static final int MAX_AGE = 100;
     // The likelihood of a tiger breeding.
-    private static final double BREEDING_PROBABILITY = 0.045;
+    private static final double BREEDING_PROBABILITY = 0.04;
     // The maximum number of births.
     private static final int MAX_LITTER_SIZE = 1;
-    // The food value of a single rabbit. In effect, this is the
-    // number of steps a tiger can go before it has to eat again.
-    private static final int RABBIT_FOOD_VALUE = 6;
-    // The food value of a single fox. In effect, this is the
-    // number of steps a tiger can go before it has to eat again.
-    private static final int FOX_FOOD_VALUE = 10;
     // Random generator
     private static final Random RANDOM = new Random();
 
     // The tiger's food level, which is increased by eating rabbits.
     private int foodLevel;
 
-    /**
-     * Create a tiger. A tiger can be created as a new born (age zero and not
-     * hungry) or with a random age and food level.
-     *
-     * @param field The field currently occupied.
-     * @param location The location within the field.
-     */
-    @Override
-    public void create(Field field, Location location) {
-        super.create(field, location);
-        foodLevel = RANDOM.nextInt(RABBIT_FOOD_VALUE);
+    public Tiger(boolean randomAge, Field field, Location location) {
+        super(randomAge, field, location);
+        foodLevel = RANDOM.nextInt(Fox.getFoodValue());
     }
 
     @Override
@@ -53,12 +39,12 @@ public class Tiger extends Animal{
      * This is what the tiger does most of the time: it hunts for rabbits. In the
      * process, it might breed, die of hunger, or die of old age.
      *
-     * @param newTigers A list to return newly born tigers.
+     * @param newActors A list to return newly born tigers.
      */
     @Override
-    public void act(List<Animal> newTigers) {
+    public void act(List<Actor> newActors) {
         incrementHunger();
-        super.act(newTigers);
+        super.act(newActors);
     }
 
     /**
@@ -85,14 +71,14 @@ public class Tiger extends Animal{
                 Rabbit rabbit = (Rabbit) animal;
                 if (rabbit.isAlive()) {
                     rabbit.setDead();
-                    foodLevel = RABBIT_FOOD_VALUE;
+                    foodLevel = Rabbit.getFoodValue();
                     return where;
                 }
             } else if (animal instanceof Fox) {
                 Fox fox = (Fox) animal;
                 if (fox.isAlive()) {
                     fox.setDead();
-                    foodLevel = FOX_FOOD_VALUE;
+                    foodLevel = Fox.getFoodValue();
                     return where;
                 }
             }
@@ -121,9 +107,7 @@ public class Tiger extends Animal{
     }
 
     @Override
-    protected Animal createYoung(Field field, Location location) {
-        Tiger tiger = new Tiger();
-        tiger.create(field, location);
-        return tiger;
+    protected Actor createYoung(Field field, Location location) {
+        return new Tiger(false, field, location);
     }
 }

@@ -11,9 +11,20 @@ public class Rabbit extends Animal {
     private static final double BREEDING_PROBABILITY = 0.12;
     // The maximum number of births.
     private static final int MAX_LITTER_SIZE = 4;
+    // The food value of a single rabbit. In effect, this is the
+    // number of steps a predator can go before it has to eat again.
+    private static final int FOOD_VALUE = 9;
+
+    public Rabbit(boolean randomAge, Field field, Location location) {
+        super(randomAge,field, location);
+    }
+
+    public static int getFoodValue() {
+        return FOOD_VALUE;
+    }
 
     @Override
-    public Location getNewLocation(){
+    public Location getNewLocation() {
         return field.freeAdjacentLocation(location);
     }
 
@@ -39,8 +50,6 @@ public class Rabbit extends Animal {
 
     @Override
     protected Animal createYoung(Field field, Location location) {
-        Rabbit rabbit = new Rabbit();
-        rabbit.create(field, location);
-        return rabbit;
+        return new Rabbit(false, field, location);
     }
 }

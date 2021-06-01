@@ -4,9 +4,8 @@ import java.util.List;
 
 public class Hunter extends Actor {
 
-    public void create(Field field, Location location){
-        this.field = field;
-        setLocation(location);
+    public Hunter(boolean randomAge, Field field, Location location){
+        super(randomAge, field, location);
     }
 
     @Override
@@ -35,7 +34,7 @@ public class Hunter extends Actor {
     }
 
     @Override
-    protected void act(List<Animal> newAnimals) {
+    protected void act(List<Actor> newActors) {
         Location newLocation = getNewLocation();
         if (newLocation != null) {
             setLocation(newLocation);

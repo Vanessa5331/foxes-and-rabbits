@@ -15,25 +15,21 @@ public class Fox extends Animal {
     // The maximum number of births.
     private static final int MAX_LITTER_SIZE = 2;
     // The food value of a single rabbit. In effect, this is the
-    // number of steps a fox can go before it has to eat again.
-    private static final int RABBIT_FOOD_VALUE = 9;
+    // number of steps a predator can go before it has to eat again.
+    private static final int FOOD_VALUE = 12;
     // Random generator
     private static final Random RANDOM = new Random();
 
     // The fox's food level, which is increased by eating rabbits.
     private int foodLevel;
 
-    /**
-     * Create a fox. A fox can be created as a new born (age zero and not
-     * hungry) or with a random age and food level.
-     *
-     * @param field The field currently occupied.
-     * @param location The location within the field.
-     */
-    @Override
-    public void create(Field field, Location location) {
-        super.create(field, location);
-        foodLevel = RANDOM.nextInt(RABBIT_FOOD_VALUE);
+    public Fox(boolean randomAge, Field field, Location location) {
+        super(randomAge, field, location);
+        foodLevel = RANDOM.nextInt(Rabbit.getFoodValue());
+    }
+
+    public static int getFoodValue() {
+        return FOOD_VALUE;
     }
 
     @Override
@@ -50,12 +46,12 @@ public class Fox extends Animal {
      * This is what the fox does most of the time: it hunts for rabbits. In the
      * process, it might breed, die of hunger, or die of old age.
      *
-     * @param newFoxes A list to return newly born foxes.
+     * @param newActors A list to return newly born foxes.
      */
     @Override
-    public void act(List<Animal> newFoxes) {
+    public void act(List<Actor> newActors) {
         incrementHunger();
-        super.act(newFoxes);
+        super.act(newActors);
     }
 
     /**
@@ -82,7 +78,7 @@ public class Fox extends Animal {
                 Rabbit rabbit = (Rabbit) animal;
                 if (rabbit.isAlive()) {
                     rabbit.setDead();
-                    foodLevel = RABBIT_FOOD_VALUE;
+                    foodLevel = Rabbit.getFoodValue();
                     return where;
                 }
             }
@@ -111,9 +107,7 @@ public class Fox extends Animal {
     }
 
     @Override
-    protected Animal createYoung(Field field, Location location) {
-        Fox fox = new Fox();
-        fox.create(field, location);
-        return fox;
+    protected Actor createYoung(Field field, Location location) {
+        return new Fox(false, field, location);
     }
 }
