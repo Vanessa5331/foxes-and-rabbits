@@ -22,8 +22,9 @@ public class Tiger extends Animal{
 
     public Tiger(boolean randomAge, Field field, Location location) {
         super(randomAge, field, location);
-        foodLevel = RANDOM.nextInt(Fox.getFoodValue());
+        foodLevel = RANDOM.nextInt(12);
     }
+
 
     @Override
     public Location getNewLocation(){
@@ -47,6 +48,11 @@ public class Tiger extends Animal{
         super.act(newActors);
     }
 
+    @Override
+    protected int getFoodValue() {
+        return 0;
+    }
+
     /**
      * Make this tiger more hungry. This could result in the tiger's death.
      */
@@ -66,19 +72,13 @@ public class Tiger extends Animal{
     private Location findFood() {
         List<Location> adjacent = field.adjacentLocations(location);
         for (Location where : adjacent) {
-            Object animal = field.getObjectAt(where);
-            if (animal instanceof Rabbit) {
-                Rabbit rabbit = (Rabbit) animal;
-                if (rabbit.isAlive()) {
-                    rabbit.setDead();
-                    foodLevel = Rabbit.getFoodValue();
-                    return where;
-                }
-            } else if (animal instanceof Fox) {
-                Fox fox = (Fox) animal;
-                if (fox.isAlive()) {
-                    fox.setDead();
-                    foodLevel = Fox.getFoodValue();
+            Object actor = field.getObjectAt(where);
+            if (actor instanceof Animal && !(actor instanceof Tiger)) {
+                Animal animal = (Animal) actor;
+                int foodValue = eatFood(animal);
+                if (foodValue != 0 && animal.isAlive()) {
+                    animal.setDead();
+                    foodLevel = foodValue;
                     return where;
                 }
             }

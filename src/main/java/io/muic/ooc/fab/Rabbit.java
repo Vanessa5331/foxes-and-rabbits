@@ -19,7 +19,8 @@ public class Rabbit extends Animal {
         super(randomAge,field, location);
     }
 
-    public static int getFoodValue() {
+    @Override
+    public int getFoodValue() {
         return FOOD_VALUE;
     }
 

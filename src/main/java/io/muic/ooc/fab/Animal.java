@@ -73,6 +73,15 @@ public abstract class Animal extends Actor{
         }
     }
 
+    protected abstract int getFoodValue();
+
+    protected int eatFood(Animal animal){
+        if(!(animal instanceof Tiger)){
+            return animal.getFoodValue();
+        }
+        return 0;
+    }
+
     /**
      * Generate a number representing the number of births, if it can breed.
      *

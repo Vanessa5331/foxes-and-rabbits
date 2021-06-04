@@ -25,10 +25,11 @@ public class Fox extends Animal {
 
     public Fox(boolean randomAge, Field field, Location location) {
         super(randomAge, field, location);
-        foodLevel = RANDOM.nextInt(Rabbit.getFoodValue());
+        foodLevel = RANDOM.nextInt(9);
     }
 
-    public static int getFoodValue() {
+    @Override
+    public int getFoodValue() {
         return FOOD_VALUE;
     }
 
@@ -73,12 +74,13 @@ public class Fox extends Animal {
     private Location findFood() {
         List<Location> adjacent = field.adjacentLocations(location);
         for (Location where : adjacent) {
-            Object animal = field.getObjectAt(where);
-            if (animal instanceof Rabbit) {
-                Rabbit rabbit = (Rabbit) animal;
-                if (rabbit.isAlive()) {
-                    rabbit.setDead();
-                    foodLevel = Rabbit.getFoodValue();
+            Object actor = field.getObjectAt(where);
+            if (actor instanceof Animal && !(actor instanceof Fox)) {
+                Animal animal = (Animal) actor;
+                int foodValue = eatFood(animal);
+                if (foodValue != 0 && animal.isAlive()) {
+                    animal.setDead();
+                    foodLevel = foodValue;
                     return where;
                 }
             }
